@@ -1,0 +1,52 @@
+.main-container {
+	width: 800px;
+	height: 800px;
+	margin: 50px auto 0 auto;
+	background-color: #75e6da;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	color: tomato;
+	text-align: center;
+}
+
+.row {
+	display: flex;
+	flex-direction: row;
+}
+
+.square {
+	width: 50px;
+	height: 50px;
+	border: solid 1px #000;
+	text-align: center;
+}
+
+.player1 {
+	background-color: #000a55;
+	background-image: url(../images/castle_blue.png);
+}
+
+.soldier1 {
+	background-color: #0000ff;
+	background-image: url(../images/soldier.png);
+}
+
+.player2 {
+	background-color: #940002;
+	background-image: url(../images/castle_red.png);
+}
+
+.soldier2 {
+	background-color: #ff002f;
+	background-image: url(../images/confederate.png);
+}
+
+.castle1 {
+	background-color: #7ec8e3;
+}
+
+.castle2 {
+	background-color: #7ec8e3;
+}

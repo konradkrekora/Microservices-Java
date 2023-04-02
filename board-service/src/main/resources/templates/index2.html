@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Home - Domination</title>
+    <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/css/bootstrap.min.css" />
+</head>
+<body>
+<div class="container text-center" >
+    <div class="text-primary">
+        <h1 class="header">Welcome to home page</h1>
+        <hr>
+    </div>
+    <div class="text-secondary">
+    </div>
+
+    <div>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Gender</th>
+                <th scope="col">Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user: ${users}">
+                <td th:text="${user.id}">ID</td>
+                <td th:text="${user.name}">Name</td>
+                <td th:text="${user.email}">Email</td>
+                <td th:text="${user.gender}">Gender</td>
+                <td th:text="${user.status}">Status</td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="container text-center text-success">
+            <h3><a class="btn btn-primary" role="button" href="/">Back to menu</a></h3>
+        </div>
+    </div>
+
+    <div>
+        <h3><a class="btn btn-primary" role="button" href="/users">Start</a></h3>
+    </div>
+</div>
+
+</body>
+</html>

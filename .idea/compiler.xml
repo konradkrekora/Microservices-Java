@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="board-service" />
+        <module name="discovery-server" />
+        <module name="player-service" />
+        <module name="castle-service" />
+        <module name="soldier-service" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="board-service" target="11" />
+      <module name="castle-service" target="11" />
+      <module name="discovery-server" target="11" />
+      <module name="player-service" target="11" />
+      <module name="soldier-service" target="11" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="board-service" options="-parameters" />
+      <module name="castle-service" options="-parameters" />
+      <module name="discovery-server" options="-parameters" />
+      <module name="player-service" options="-parameters" />
+      <module name="soldier-service" options="-parameters" />
+    </option>
+  </component>
+</project>
