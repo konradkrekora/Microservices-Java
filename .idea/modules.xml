@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/castle-service/castle-service.iml" filepath="$PROJECT_DIR$/castle-service/castle-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/discovery-server/discovery-server.iml" filepath="$PROJECT_DIR$/discovery-server/discovery-server.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/mikroserwisy.iml" filepath="$PROJECT_DIR$/.idea/mikroserwisy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/panel-service/panel-service.iml" filepath="$PROJECT_DIR$/panel-service/panel-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/player-service/player-service.iml" filepath="$PROJECT_DIR$/player-service/player-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/soldier-service/soldier-service.iml" filepath="$PROJECT_DIR$/soldier-service/soldier-service.iml" />
     </modules>

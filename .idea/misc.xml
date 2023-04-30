@@ -8,6 +8,7 @@
         <option value="$PROJECT_DIR$/player-service/pom.xml" />
         <option value="$PROJECT_DIR$/soldier-service/pom.xml" />
         <option value="$PROJECT_DIR$/discovery-server/pom.xml" />
+        <option value="$PROJECT_DIR$/panel-service/pom.xml" />
       </list>
     </option>
   </component>

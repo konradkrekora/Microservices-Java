@@ -11,6 +11,7 @@
         <module name="discovery-server" />
         <module name="player-service" />
         <module name="castle-service" />
+        <module name="panel-service" />
         <module name="soldier-service" />
       </profile>
     </annotationProcessing>
@@ -18,6 +19,8 @@
       <module name="board-service" target="11" />
       <module name="castle-service" target="11" />
       <module name="discovery-server" target="11" />
+      <module name="panel-service" target="11" />
+      <module name="panel-service (1)" target="11" />
       <module name="player-service" target="11" />
       <module name="soldier-service" target="11" />
     </bytecodeTargetLevel>
@@ -27,6 +30,8 @@
       <module name="board-service" options="-parameters" />
       <module name="castle-service" options="-parameters" />
       <module name="discovery-server" options="-parameters" />
+      <module name="panel-service" options="-parameters" />
+      <module name="panel-service (1)" options="-parameters" />
       <module name="player-service" options="-parameters" />
       <module name="soldier-service" options="-parameters" />
     </option>

@@ -1,8 +1,11 @@
 package pl.kk.boardservice.services;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.servlet.ModelAndView;
 import pl.kk.boardservice.models.GameData;
 import pl.kk.boardservice.models.Player;
@@ -24,8 +27,12 @@ public class BoardService {
     private static int gameOverFlag = 0;
     private static PlayersList playersList;
     private RestTemplate restTemplate;
+    private WebClient webClient;
 
     //    public List<List<Unit>> getBoard() {
+
+//    @CircuitBreaker(name = "getBoard", fallbackMethod = "getBoardFallback")
+//    @Retry(name = "getBoard")
     public GameData getBoard() {
 
 //        List<GameData> games = new ArrayList<>();
@@ -34,8 +41,8 @@ public class BoardService {
         int totalTurns = 0;
         long startTime = System.currentTimeMillis();
 
-        for (int index = 0; index < 100; index++) {
-
+        //todo index < 100 dla testow
+        for (int index = 0; index < 5; index++) {
 
             /**
              * Starts the game
@@ -142,26 +149,13 @@ public class BoardService {
         return modelAndView;
     }
 
+    public GameData getBoardFallback(Exception ex) {
+        gameStartedFlag = 0;
+        gameOverFlag = 0;
 
-//    public List<List<Unit>> getRandomBoard() {
-//        List<List<Unit>> listOfUnitsLists = new ArrayList<>();
-//        for (int i = 1; i <=10 ; i++) {
-//            List<Unit> unitsList = new ArrayList<>();
-//            for (int j = 1; j <=10 ; j++) {
-//                UnitType value = UnitType.values()[new Random().nextInt(UnitType.values().length)];
-//                PlayerNumber playerNumber = PlayerNumber.values()[new Random().nextInt(PlayerNumber.values().length)];
-//                String player = playerNumber.toString();
-//                int playerId;
-//                if (playerNumber.equals(PlayerNumber.P1)) {
-//                    playerId = 1;
-//                } else {
-//                    playerId = 2;
-//                }
-//                unitsList.add(new Unit(value, playerId, player));
-//            }
-//            listOfUnitsLists.add(unitsList);
-//        }
-//        return listOfUnitsLists;
-//    }
-
+        return GameData.builder()
+                .totalTimeMillisecs(1000L)
+                .totalTurns(10)
+                .build();
+    }
 }

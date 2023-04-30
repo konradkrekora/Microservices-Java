@@ -6,8 +6,8 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @Entity
 @Table(name = "Player")
@@ -19,11 +19,4 @@ public class Player {
     private int y;
     private int spawnRate;
     private int isAlive;
-
-    public Player(int x, int y, int spawnRate, int isAlive) {
-        this.x = x;
-        this.y = y;
-        this.spawnRate = spawnRate;
-        this.isAlive = isAlive;
-    }
 }

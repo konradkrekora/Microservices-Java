@@ -28,7 +28,12 @@ public class PlayerService {
             int y = rand.nextInt(5) + 1 + i;
 //            int spawnRate = rand.nextInt(5) + 1;
             int spawnRate = 1;
-            spawnedPlayers.add(new Player(x, y, spawnRate ,1));
+            spawnedPlayers.add(Player.builder()
+                    .x(x)
+                    .y(y)
+                    .spawnRate(spawnRate)
+                    .isAlive(1)
+                    .build());
         }
         playerRepository.saveAll(spawnedPlayers);
         return "Players spawned";

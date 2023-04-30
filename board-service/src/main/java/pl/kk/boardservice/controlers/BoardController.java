@@ -1,5 +1,7 @@
 package pl.kk.boardservice.controlers;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +23,7 @@ public class BoardController {
     public GameData getBoard() {
         return boardService.getBoard();
     }
+
     @GetMapping("/")
     public ModelAndView showHomePage() {
         return boardService.showHomePage();
