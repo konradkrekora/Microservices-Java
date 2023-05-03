@@ -19,9 +19,13 @@ public class BoardController {
     private BoardService boardService;
 
     @GetMapping("/getBoard")
-//    public List<List<Unit>> getBoard() {
     public GameData getBoard() {
         return boardService.getBoard();
+    }
+
+    @GetMapping("/getTest")
+    public String getTest() throws InterruptedException {
+        return boardService.getTest();
     }
 
     @GetMapping("/")

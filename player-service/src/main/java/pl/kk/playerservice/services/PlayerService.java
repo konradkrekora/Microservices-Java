@@ -2,6 +2,7 @@ package pl.kk.playerservice.services;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import pl.kk.playerservice.models.Player;
 import pl.kk.playerservice.models.PlayersList;
@@ -15,18 +16,15 @@ import java.util.Random;
 @AllArgsConstructor
 public class PlayerService {
 
-    private RestTemplate restTemplate;
     private PlayerRepository playerRepository;
-    private static int currentPlayerTurn = 0;
-    private static int firstPlayer = 0;
 
-    public String spawnPlayers() {
+
+    public PlayersList spawnPlayers() {
         List<Player> spawnedPlayers = new ArrayList<>();
         Random rand = new Random();
         for (int i = 0; i < 6 ; i = i + 5) {
             int x = rand.nextInt(5) + 1 + i;
             int y = rand.nextInt(5) + 1 + i;
-//            int spawnRate = rand.nextInt(5) + 1;
             int spawnRate = 1;
             spawnedPlayers.add(Player.builder()
                     .x(x)
@@ -36,49 +34,18 @@ public class PlayerService {
                     .build());
         }
         playerRepository.saveAll(spawnedPlayers);
-        return "Players spawned";
+        return PlayersList.builder().players(spawnedPlayers).build();
     }
 
-    public PlayersList getAllPlayers() {
+    public PlayersList getAllPlayers(long playerId, long enemyId) {
+        List<Long> playersIds = List.of(playerId, enemyId);
         PlayersList playersList = new PlayersList();
-        playersList.setPlayers(playerRepository.findAll());
+        playersList.setPlayers(playerRepository.findByPlayerIdIn(playersIds));
         return playersList;
     }
 
-    public int switchPlayerTurn() {
-        if (currentPlayerTurn == 0)
-        {
-            PlayersList playersList = new PlayersList();
-            List<Player> players = playerRepository.findAll();
-            playersList.setPlayers(players);
-            currentPlayerTurn = (int) players.get(0).getPlayerId();
-            firstPlayer = (int)players.get(0).getPlayerId();
-            return currentPlayerTurn;
-        }
-
-        if (currentPlayerTurn == firstPlayer)
-        {
-            currentPlayerTurn = firstPlayer + 1;
-        }
-        else if (currentPlayerTurn == firstPlayer + 1)
-        {
-            currentPlayerTurn = firstPlayer;
-        }
-        return currentPlayerTurn;
-    }
-
-    public int getPlayerTurn() {
-        return currentPlayerTurn;
-    }
-
-    public String removePlayer(long playerId) {
+    public Long removePlayer(long playerId) {
         playerRepository.deleteById(playerId);
-        return "Player" + playerId + " conquered!";
-    }
-
-    public String removePlayers() {
-        playerRepository.deleteAll();
-        currentPlayerTurn = 0;
-        return "Players removed!";
+        return playerId;
     }
 }

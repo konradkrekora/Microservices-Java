@@ -20,10 +20,10 @@ public class PanelServiceApplication {
 		return new RestTemplate();
 	}
 
-	@Bean
-	public WebClient.Builder getWebClientBuilder() {
-		return WebClient.builder();
-	}
+//	@Bean
+//	public WebClient.Builder getWebClientBuilder() {
+//		return WebClient.builder();
+//	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(PanelServiceApplication.class, args);

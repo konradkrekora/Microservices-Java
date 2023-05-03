@@ -27,9 +27,9 @@ public class SoldierController {
         return soldierService.moveSoldiers(playerId);
     }
 
-    @GetMapping("/soldiersFight/{playerId}")
-    public String soldiersFight(@PathVariable("playerId") long playerId) {
-        return soldierService.soldiersFight(playerId);
+    @GetMapping("/soldiersFight/{playerId}/{enemyId}")
+    public Long soldiersFight(@PathVariable("playerId") long playerId, @PathVariable("enemyId") long enemyId) {
+        return soldierService.soldiersFight(playerId, enemyId);
     }
 
 
@@ -38,13 +38,8 @@ public class SoldierController {
         return soldierService.getAllSoldiers();
     }
 
-    @GetMapping("/getConqueredPlayerId")
-    public Long getConqueredPlayerId() {
-        return soldierService.getConqueredPlayerId();
-    }
-
-    @GetMapping("/removeSoldiers")
-    public String removeSoldiers() {
-        return soldierService.removeAllSoldiers();
+    @GetMapping("/removeSoldiersByPlayerId/{playerId}")
+    public Long removeSoldiersByPlayerId(@PathVariable("playerId") long playerId) {
+        return soldierService.removeSoldiersByPlayerId(playerId);
     }
 }

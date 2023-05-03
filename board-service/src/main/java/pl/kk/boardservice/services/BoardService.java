@@ -1,8 +1,7 @@
 package pl.kk.boardservice.services;
 
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -15,34 +14,34 @@ import pl.kk.boardservice.models.SoldiersList;
 import pl.kk.boardservice.models.Unit;
 import pl.kk.boardservice.models.UnitType;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class BoardService {
 
-    private static int gameStartedFlag = 0;
-    private static int gameOverFlag = 0;
-    private static PlayersList playersList;
     private RestTemplate restTemplate;
     private WebClient webClient;
 
-    //    public List<List<Unit>> getBoard() {
-
-//    @CircuitBreaker(name = "getBoard", fallbackMethod = "getBoardFallback")
+    //    @CircuitBreaker(name = "getBoard", fallbackMethod = "getBoardFallback")
 //    @Retry(name = "getBoard")
     public GameData getBoard() {
 
-//        List<GameData> games = new ArrayList<>();
+        int gameStartedFlag = 0;
+        int gameOverFlag = 0;
+        long currentPlayerId = 0;
+        PlayersList playersList = new PlayersList();
 
-        long totalTimeMillisecs = 0;
+        long totalTimeMillisecs;
         int totalTurns = 0;
         long startTime = System.currentTimeMillis();
 
         //todo index < 100 dla testow
-        for (int index = 0; index < 5; index++) {
+        for (int index = 0; index < 3; index++) {
 
             /**
              * Starts the game
@@ -50,9 +49,7 @@ public class BoardService {
             do {
 
                 if (gameStartedFlag == 0) {
-                    String removePlayers = restTemplate.getForObject("http://player-service/players/removePlayers", String.class);
-                    String spawnedPlayers = restTemplate.getForObject("http://player-service/players/spawnPlayers", String.class);
-                    String removeSoldiers = restTemplate.getForObject("http://soldier-service/soldiers/removeSoldiers", String.class);
+                    playersList = restTemplate.getForObject("http://player-service/players/spawnPlayers", PlayersList.class);
                     gameStartedFlag = 1;
                     gameOverFlag = 0;
                 }
@@ -60,15 +57,13 @@ public class BoardService {
                 /**
                  * Switch turn between players
                  */
-                int switchPlayerTurn = restTemplate.getForObject("http://player-service/players/switchPlayerTurn", Integer.class);
-                playersList = restTemplate.getForObject("http://player-service/players/getPlayers", PlayersList.class);
+                currentPlayerId = switchPlayerTurn(currentPlayerId, playersList);
                 List<Player> players = playersList.getPlayers();
-
 
                 if (players.size() > 1) {
                     Player currentPlayer = new Player();
                     for (Player player : players) {
-                        if (player.getPlayerId() == switchPlayerTurn) {
+                        if (player.getPlayerId() == currentPlayerId) {
                             currentPlayer = player;
                         }
                     }
@@ -76,60 +71,45 @@ public class BoardService {
                     /**
                      * Spawns new soldiers for currently active player
                      */
-                    String spawnedSoldiers = restTemplate.getForObject("http://soldier-service/soldiers/spawnSoldiers/" + switchPlayerTurn + "/"
+                    String spawnedSoldiers = restTemplate.getForObject("http://soldier-service/soldiers/spawnSoldiers/" + currentPlayerId + "/"
                             + currentPlayer.getSpawnRate() + "/" + currentPlayer.getX() + "/" + currentPlayer.getY(), String.class);
-                } else {
-
-                    gameStartedFlag = 0;
-                    gameOverFlag = 1;
-                    System.out.println("GAME OVER");
                 }
                 /**
                  * Moves all soldiers of currently active player
                  */
-                String moveSoldiers = restTemplate.getForObject("http://soldier-service/soldiers/moveSoldiers/" + switchPlayerTurn, String.class);
+                String moveSoldiers = restTemplate.getForObject("http://soldier-service/soldiers/moveSoldiers/" + currentPlayerId, String.class);
                 /**
                  * Attacks from current player soldiers against other players
                  */
-                String soldiersFight = restTemplate.getForObject("http://soldier-service/soldiers/soldiersFight/" + switchPlayerTurn, String.class);
-                System.out.println(soldiersFight);
+                Long enemyPlayer = getEnemyPlayerId(currentPlayerId, playersList);
+                System.out.println("enemyPlayer:" + enemyPlayer);
+                System.out.println("currentPlayerId before fight:" + currentPlayerId);
+                Long conqueredPlayerId = restTemplate.getForObject("http://soldier-service/soldiers/soldiersFight/" + currentPlayerId + "/" + enemyPlayer, Long.class);
+                System.out.println("conqueredPlayerId:" + conqueredPlayerId);
+                System.out.println("currentPlayerId:" + currentPlayerId);
+                if (conqueredPlayerId != null && conqueredPlayerId != 0) {
+                    playersList.setPlayers(playersList.getPlayers().stream().filter(p -> p.getPlayerId() != conqueredPlayerId)
+                            .toList());
+
+                    //usunięcie wygranego gracza, zmiana ustawień na koniec gry
+                    restTemplate.getForObject("http://player-service/players/removePlayer/" + playersList.getPlayers().get(0).getPlayerId(), Long.class);
+                    restTemplate.getForObject("http://soldier-service/soldiers/removeSoldiersByPlayerId/" + playersList.getPlayers().get(0).getPlayerId(), Long.class);
+                    gameStartedFlag = 0;
+                    gameOverFlag = 1;
+                    playersList.setPlayers(new ArrayList<>());
+                    System.out.println("GAME OVER");
+                }
 
                 SoldiersList soldiersList = restTemplate.getForObject("http://soldier-service/soldiers/getSoldiers", SoldiersList.class);
                 List<Soldier> soldiers = soldiersList.getSoldiers();
 
 
-                List<List<Unit>> listOfUnitsLists = new ArrayList<>();
-
                 /**
-                 * Places all units(players and soldiers) on the board
+                 * Places all units(players and soldiers) on the board - for visualization purpouse
                  */
-                for (int i = 1; i <= 10; i++) {
-                    List<Unit> unitsList = new ArrayList<>();
-                    for (int j = 1; j <= 10; j++) {
-                        UnitType unitType = UnitType.empty;
-                        long playerId = 0;
-                        String name = null;
+                List<List<Unit>> listOfUnitsLists = new ArrayList<>();
+                listOfUnitsLists = placeUnitsOnBoard(players, soldiers, listOfUnitsLists);
 
-                        for (Soldier soldier : soldiers) {
-                            if (j == soldier.getX() && i == soldier.getY()) {
-                                unitType = UnitType.soldier;
-                                playerId = soldier.getPlayerId();
-                                //name = "S" + playerId;
-                            }
-                        }
-
-                        for (Player player : players) {
-                            if (j == player.getX() && i == player.getY()) {
-                                unitType = UnitType.player;
-                                playerId = player.getPlayerId();
-                                //name = "P" + playerId;
-                            }
-                        }
-
-                        unitsList.add(new Unit(unitType, playerId, name));
-                    }
-                    listOfUnitsLists.add(unitsList);
-                }
                 //koniec tury. dodanie do sumy tur
                 totalTurns++;
             }
@@ -143,19 +123,80 @@ public class BoardService {
         return new GameData(totalTimeMillisecs, totalTurns);
     }
 
+
+    private List<List<Unit>> placeUnitsOnBoard(List<Player> players, List<Soldier> soldiers, List<List<Unit>> listOfUnitsLists) {
+        for (int i = 1; i <= 10; i++) {
+            List<Unit> unitsList = new ArrayList<>();
+            for (int j = 1; j <= 10; j++) {
+                UnitType unitType = UnitType.empty;
+                long playerId = 0;
+                String name = null;
+
+                for (Soldier soldier : soldiers) {
+                    if (j == soldier.getX() && i == soldier.getY()) {
+                        unitType = UnitType.soldier;
+                        playerId = soldier.getPlayerId();
+                        //name = "S" + playerId;
+                    }
+                }
+
+                for (Player player : players) {
+                    if (j == player.getX() && i == player.getY()) {
+                        unitType = UnitType.player;
+                        playerId = player.getPlayerId();
+                        //name = "P" + playerId;
+                    }
+                }
+
+                unitsList.add(new Unit(unitType, playerId, name));
+            }
+            listOfUnitsLists.add(unitsList);
+        }
+        return listOfUnitsLists;
+    }
+
     public ModelAndView showHomePage() {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("index2.html");
         return modelAndView;
     }
 
+    public String getTest() throws InterruptedException {
+        String poczatek = ZonedDateTime.now().toString();
+        TimeUnit.SECONDS.sleep(10);
+        String koniec = ZonedDateTime.now().toString();
+        log.info(poczatek + koniec);
+        return poczatek + koniec;
+    }
+
     public GameData getBoardFallback(Exception ex) {
-        gameStartedFlag = 0;
-        gameOverFlag = 0;
 
         return GameData.builder()
                 .totalTimeMillisecs(1000L)
                 .totalTurns(10)
                 .build();
+    }
+
+    private long switchPlayerTurn(long currentPlayerTurn, PlayersList playersList) {
+
+        if (currentPlayerTurn == playersList.getPlayers().get(0).getPlayerId())
+        {
+            currentPlayerTurn = playersList.getPlayers().get(1).getPlayerId();
+        }
+        else
+        {
+            currentPlayerTurn = playersList.getPlayers().get(0).getPlayerId();
+        }
+        return currentPlayerTurn;
+    }
+
+    private long getEnemyPlayerId(long currentPlayerId, PlayersList playersList) {
+        long enemyPlayerId = 0;
+        for (Player player: playersList.getPlayers()) {
+            if (currentPlayerId != player.getPlayerId()) {
+                enemyPlayerId = player.getPlayerId();
+            }
+        }
+        return enemyPlayerId;
     }
 }

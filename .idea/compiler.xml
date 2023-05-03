@@ -16,7 +16,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="board-service" target="11" />
+      <module name="board-service" target="16" />
       <module name="castle-service" target="11" />
       <module name="discovery-server" target="11" />
       <module name="panel-service" target="11" />

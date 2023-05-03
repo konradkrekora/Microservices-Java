@@ -13,9 +13,6 @@ public interface SoldierRepository extends JpaRepository<Soldier, Long> {
 
     List<Soldier> findAllByPlayerId(Long playerId);
 
-    @Query("select s from Soldier s where s.playerId not in ?1")
-    List<Soldier> findAllSoldiersWithDifferentPlayerId(Long playerId);
-
     @Modifying
     @Query("delete from Soldier s where s.id = ?1")
     void deleteBySoldierId(Long soldierId);
