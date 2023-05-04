@@ -161,14 +161,6 @@ public class BoardService {
         return modelAndView;
     }
 
-    public String getTest() throws InterruptedException {
-        String poczatek = ZonedDateTime.now().toString();
-        TimeUnit.SECONDS.sleep(10);
-        String koniec = ZonedDateTime.now().toString();
-        log.info(poczatek + koniec);
-        return poczatek + koniec;
-    }
-
     public GameData getBoardFallback(Exception ex) {
 
         return GameData.builder()

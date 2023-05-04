@@ -29,9 +29,7 @@ public class PanelService {
                     .retrieve()
                     .bodyToFlux(GameData.class);
             gameDataFlux.subscribe(tweet -> log.info(tweet.toString() + " --- " + System.currentTimeMillis()));
-            Thread.sleep(50);
         }
-
 
         log.info("Exiting NON-BLOCKING Controller!" + " --- " + System.currentTimeMillis());
         return Flux.just(GameData.builder().build());
@@ -48,7 +46,6 @@ public class PanelService {
         return gameDataFlux;
     }
 
-
     public GameData getGameResult() {
         log.info("Poczatek sync");
 //        todo: sync with RestTemplate
@@ -61,22 +58,6 @@ public class PanelService {
                 .bodyToMono(GameData.class)
                 .block();
 
-        log.info("Koniec sync");
-        return gamedata;
-    }
-
-    public Flux<String> getTest() {
-        log.info("Poczatek sync");
-//        todo: sync with RestTemplate
-//        GameData gamedata = restTemplate.getForObject("http://board-service/getBoard", GameData.class);
-
-//        todo: sync with WebClient
-        Flux<String> gamedata = webClientBuilder.build().get()
-                .uri("http://board-service/getTest")
-                .retrieve()
-                .bodyToFlux(String.class);
-
-        gamedata.subscribe(log::info);
         log.info("Koniec sync");
         return gamedata;
     }
