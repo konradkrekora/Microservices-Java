@@ -11,8 +11,10 @@ import pl.kk.soldierservice.repositories.SoldierRepository;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -70,9 +72,10 @@ public class SoldierService {
     @Transactional
     public Long soldiersFight(long playerId, long enemyId) {
         List<Soldier> currentPlayerSoldiers = soldierRepository.findAllByPlayerId(playerId);//TODO FIX 2 zapytania
+        List<Soldier> enemySoldiers = soldierRepository.findAllByPlayerId(enemyId);//TODO FIX 2 zapytania
+        Set<Long> soldiersToDelete = new HashSet<>();
         for (Soldier soldier : currentPlayerSoldiers) {
-            List<Soldier> enemySoldiers = soldierRepository.findAllByPlayerId(enemyId);//TODO FIX 2 zapytania
-            PlayersList playersList = restTemplate.getForObject("http://player-service/players/getPlayers/"+ playerId + "/" + enemyId, PlayersList.class);
+            PlayersList playersList = restTemplate.getForObject("http://player-service/players/getPlayers/" + playerId + "/" + enemyId, PlayersList.class);
             for (Player player : playersList.getPlayers()) {
                 if (soldier.getX() >= player.getX() - 1 && soldier.getX() <= player.getX() + 1
                         && soldier.getY() >= player.getY() - 1 && soldier.getY() <= player.getY() + 1
@@ -85,12 +88,11 @@ public class SoldierService {
                 if (soldier.getX() >= otherPlayerSoldier.getX() - 1 && soldier.getX() <= otherPlayerSoldier.getX() + 1
                         && soldier.getY() >= otherPlayerSoldier.getY() - 1 && soldier.getY() <= otherPlayerSoldier.getY() + 1) {
                     otherPlayerSoldier.setIsAlive(0);
-                    soldierRepository.deleteById(otherPlayerSoldier.getId());
+                    soldiersToDelete.add(otherPlayerSoldier.getId());
                 }
             }
-
-
         }
+        soldierRepository.deleteByIdIn(soldiersToDelete);
         return 0L;
     }
 

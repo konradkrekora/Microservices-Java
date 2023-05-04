@@ -41,7 +41,7 @@ public class BoardService {
         long startTime = System.currentTimeMillis();
 
         //todo index < 100 dla testow
-        for (int index = 0; index < 3; index++) {
+        for (int index = 0; index < 10; index++) {
 
             /**
              * Starts the game

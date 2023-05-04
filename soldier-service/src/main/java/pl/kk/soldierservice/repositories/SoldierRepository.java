@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import pl.kk.soldierservice.models.Soldier;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface SoldierRepository extends JpaRepository<Soldier, Long> {
@@ -16,6 +17,8 @@ public interface SoldierRepository extends JpaRepository<Soldier, Long> {
     @Modifying
     @Query("delete from Soldier s where s.id = ?1")
     void deleteBySoldierId(Long soldierId);
+
+    void deleteByIdIn(Set<Long> soldiersId);
 
     @Modifying
     @Query("delete from Soldier s where s.playerId = ?1")
