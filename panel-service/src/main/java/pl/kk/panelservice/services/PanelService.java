@@ -25,7 +25,7 @@ public class PanelService {
         for (int i = 0; i < 2; i++) {
             Flux<GameData> gameDataFlux = webClientBuilder.build()
                     .get()
-                    .uri("http://board-service/getBoard")
+                    .uri("http://board-service/api/board/getBoard")
                     .retrieve()
                     .bodyToFlux(GameData.class);
             gameDataFlux.subscribe(tweet -> log.info(tweet.toString() + " --- " + System.currentTimeMillis()));
@@ -38,7 +38,7 @@ public class PanelService {
     public Flux<GameData> getGameResultAsync2() {
         log.info("Poczatek async");
         Flux<GameData> gameDataFlux = webClientBuilder.build().get()
-                .uri("http://board-service/getBoard")
+                .uri("http://board-service/api/board/getBoard")
                 .retrieve()
                 .bodyToFlux(GameData.class);
         log.info("Koniec async");
@@ -49,11 +49,11 @@ public class PanelService {
     public GameData getGameResult() {
         log.info("Poczatek sync");
 //        todo: sync with RestTemplate
-//        GameData gamedata = restTemplate.getForObject("http://board-service/getBoard", GameData.class);
+//        GameData gamedata = restTemplate.getForObject("http://board-service/api/board/getBoard", GameData.class);
 
 //        todo: sync with WebClient
         GameData gamedata = webClientBuilder.build().get()
-                .uri("http://board-service/getBoard")
+                .uri("http://board-service/api/board/getBoard")
                 .retrieve()
                 .bodyToMono(GameData.class)
                 .block();

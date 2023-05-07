@@ -49,7 +49,7 @@ public class BoardService {
             do {
 
                 if (gameStartedFlag == 0) {
-                    playersList = restTemplate.getForObject("http://player-service/players/spawnPlayers", PlayersList.class);
+                    playersList = restTemplate.getForObject("http://player-service/api/player/spawnPlayers", PlayersList.class);
                     gameStartedFlag = 1;
                     gameOverFlag = 0;
                 }
@@ -71,20 +71,20 @@ public class BoardService {
                     /**
                      * Spawns new soldiers for currently active player
                      */
-                    String spawnedSoldiers = restTemplate.getForObject("http://soldier-service/soldiers/spawnSoldiers/" + currentPlayerId + "/"
+                    String spawnedSoldiers = restTemplate.getForObject("http://soldier-service/api/soldier/spawnSoldiers/" + currentPlayerId + "/"
                             + currentPlayer.getSpawnRate() + "/" + currentPlayer.getX() + "/" + currentPlayer.getY(), String.class);
                 }
                 /**
                  * Moves all soldiers of currently active player
                  */
-                String moveSoldiers = restTemplate.getForObject("http://soldier-service/soldiers/moveSoldiers/" + currentPlayerId, String.class);
+                String moveSoldiers = restTemplate.getForObject("http://soldier-service/api/soldier/moveSoldiers/" + currentPlayerId, String.class);
                 /**
                  * Attacks from current player soldiers against other players
                  */
                 Long enemyPlayer = getEnemyPlayerId(currentPlayerId, playersList);
                 System.out.println("enemyPlayer:" + enemyPlayer);
                 System.out.println("currentPlayerId before fight:" + currentPlayerId);
-                Long conqueredPlayerId = restTemplate.getForObject("http://soldier-service/soldiers/soldiersFight/" + currentPlayerId + "/" + enemyPlayer, Long.class);
+                Long conqueredPlayerId = restTemplate.getForObject("http://soldier-service/api/soldier/soldiersFight/" + currentPlayerId + "/" + enemyPlayer, Long.class);
                 System.out.println("conqueredPlayerId:" + conqueredPlayerId);
                 System.out.println("currentPlayerId:" + currentPlayerId);
                 if (conqueredPlayerId != null && conqueredPlayerId != 0) {
@@ -92,15 +92,15 @@ public class BoardService {
                             .toList());
 
                     //usunięcie wygranego gracza, zmiana ustawień na koniec gry
-                    restTemplate.getForObject("http://player-service/players/removePlayer/" + playersList.getPlayers().get(0).getPlayerId(), Long.class);
-                    restTemplate.getForObject("http://soldier-service/soldiers/removeSoldiersByPlayerId/" + playersList.getPlayers().get(0).getPlayerId(), Long.class);
+                    restTemplate.getForObject("http://player-service/api/player/removePlayer/" + playersList.getPlayers().get(0).getPlayerId(), Long.class);
+                    restTemplate.getForObject("http://soldier-service/api/soldier/removeSoldiersByPlayerId/" + playersList.getPlayers().get(0).getPlayerId(), Long.class);
                     gameStartedFlag = 0;
                     gameOverFlag = 1;
                     playersList.setPlayers(new ArrayList<>());
                     System.out.println("GAME OVER");
                 }
 
-                SoldiersList soldiersList = restTemplate.getForObject("http://soldier-service/soldiers/getSoldiers", SoldiersList.class);
+                SoldiersList soldiersList = restTemplate.getForObject("http://soldier-service/api/soldier/getSoldiers", SoldiersList.class);
                 List<Soldier> soldiers = soldiersList.getSoldiers();
 
 

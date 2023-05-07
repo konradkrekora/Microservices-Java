@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/players")
+@RequestMapping("/api/player")
 public class PlayerController {
 
     private PlayerService playerService;

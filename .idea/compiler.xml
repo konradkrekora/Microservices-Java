@@ -9,24 +9,27 @@
         <outputRelativeToContentRoot value="true" />
         <module name="board-service" />
         <module name="discovery-server" />
-        <module name="player-service" />
-        <module name="castle-service" />
         <module name="panel-service" />
         <module name="soldier-service" />
+        <module name="api-gateway" />
+        <module name="player-service" />
+        <module name="castle-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="api-gateway" target="17" />
       <module name="board-service" target="16" />
       <module name="castle-service" target="11" />
       <module name="discovery-server" target="11" />
       <module name="panel-service" target="11" />
       <module name="panel-service (1)" target="11" />
-      <module name="player-service" target="11" />
+      <module name="player-service" target="17" />
       <module name="soldier-service" target="11" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="api-gateway" options="-parameters" />
       <module name="board-service" options="-parameters" />
       <module name="castle-service" options="-parameters" />
       <module name="discovery-server" options="-parameters" />

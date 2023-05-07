@@ -75,13 +75,13 @@ public class SoldierService {
         List<Soldier> enemySoldiers = soldierRepository.findAllByPlayerId(enemyId);//TODO FIX 2 zapytania
         Set<Long> soldiersToDelete = new HashSet<>();
         for (Soldier soldier : currentPlayerSoldiers) {
-            PlayersList playersList = restTemplate.getForObject("http://player-service/players/getPlayers/" + playerId + "/" + enemyId, PlayersList.class);
+            PlayersList playersList = restTemplate.getForObject("http://player-service/api/player/getPlayers/" + playerId + "/" + enemyId, PlayersList.class);
             for (Player player : playersList.getPlayers()) {
                 if (soldier.getX() >= player.getX() - 1 && soldier.getX() <= player.getX() + 1
                         && soldier.getY() >= player.getY() - 1 && soldier.getY() <= player.getY() + 1
                         && soldier.getPlayerId() != player.getPlayerId()) {
                     soldierRepository.deleteByPlayerId(player.getPlayerId());
-                    return restTemplate.getForObject("http://player-service/players/removePlayer/" + player.getPlayerId(), Long.class);
+                    return restTemplate.getForObject("http://player-service/api/player/removePlayer/" + player.getPlayerId(), Long.class);
                 }
             }
             for (Soldier otherPlayerSoldier : enemySoldiers) {

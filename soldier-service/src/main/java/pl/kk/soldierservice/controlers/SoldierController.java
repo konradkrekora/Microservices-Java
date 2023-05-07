@@ -11,7 +11,7 @@ import pl.kk.soldierservice.services.SoldierService;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/soldiers")
+@RequestMapping("/api/soldier")
 public class SoldierController {
 
     private SoldierService soldierService;

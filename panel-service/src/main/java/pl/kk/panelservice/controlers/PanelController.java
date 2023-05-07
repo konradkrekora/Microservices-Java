@@ -2,6 +2,7 @@ package pl.kk.panelservice.controlers;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import pl.kk.panelservice.models.GameData;
@@ -10,6 +11,7 @@ import reactor.core.publisher.Flux;
 
 @RestController
 @AllArgsConstructor
+@RequestMapping("/api/panel")
 public class PanelController {
 
     private PanelService panelService;
@@ -24,14 +26,9 @@ public class PanelController {
         return panelService.getGameResult();
     }
 
-    @GetMapping("/getTest")
-    public Flux<String> getTest() {
-        return panelService.getTest();
-    }
-
-    @GetMapping("/")
-    public ModelAndView showHomePage() {
-        return panelService.showHomePage();
-    }
+//    @GetMapping("/")
+//    public ModelAndView showHomePage() {
+//        return panelService.showHomePage();
+//    }
 
 }
