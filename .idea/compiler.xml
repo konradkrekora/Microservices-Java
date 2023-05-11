@@ -21,7 +21,7 @@
       <module name="board-service" target="16" />
       <module name="castle-service" target="11" />
       <module name="discovery-server" target="11" />
-      <module name="panel-service" target="11" />
+      <module name="panel-service" target="17" />
       <module name="panel-service (1)" target="11" />
       <module name="player-service" target="17" />
       <module name="soldier-service" target="11" />

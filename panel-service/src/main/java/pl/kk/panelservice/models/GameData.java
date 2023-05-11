@@ -19,4 +19,5 @@ public class GameData {
 
     private long totalTimeMillisecs;
     private int totalTurns;
+    private String status;
 }
