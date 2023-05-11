@@ -120,7 +120,7 @@ public class BoardService {
         totalTimeMillisecs = endTime - startTime;
 
 //        return listOfUnitsLists;
-        return new GameData(totalTimeMillisecs, totalTurns);
+        return new GameData(totalTimeMillisecs, totalTurns, "OK");
     }
 
 
