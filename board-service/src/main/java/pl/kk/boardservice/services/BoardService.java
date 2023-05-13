@@ -14,10 +14,8 @@ import pl.kk.boardservice.models.SoldiersList;
 import pl.kk.boardservice.models.Unit;
 import pl.kk.boardservice.models.UnitType;
 
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @AllArgsConstructor
@@ -39,6 +37,14 @@ public class BoardService {
         long totalTimeMillisecs;
         int totalTurns = 0;
         long startTime = System.currentTimeMillis();
+        long tempStartTime = 0;
+        long spawnPlayersTime = 0;
+        long switchPlayerAndSpawnSoldiersTime = 0;
+        long moveSoldiersTime = 0;
+        long soldiersFightTime = 0;
+        long resetGameTime = 0;
+        long getSoldiersAndPlaceAllUnitsOnBoardTime = 0;
+
 
         //todo index < 100 dla testow
         for (int index = 0; index < 10; index++) {
@@ -49,14 +55,17 @@ public class BoardService {
             do {
 
                 if (gameStartedFlag == 0) {
+                    tempStartTime = System.currentTimeMillis(); //todo delete
                     playersList = restTemplate.getForObject("http://player-service/api/player/spawnPlayers", PlayersList.class);
                     gameStartedFlag = 1;
                     gameOverFlag = 0;
+                    spawnPlayersTime += System.currentTimeMillis() - tempStartTime; //todo delete
                 }
 
                 /**
                  * Switch turn between players
                  */
+                tempStartTime = System.currentTimeMillis(); //todo delete
                 currentPlayerId = switchPlayerTurn(currentPlayerId, playersList);
                 List<Player> players = playersList.getPlayers();
 
@@ -74,19 +83,22 @@ public class BoardService {
                     String spawnedSoldiers = restTemplate.getForObject("http://soldier-service/api/soldier/spawnSoldiers/" + currentPlayerId + "/"
                             + currentPlayer.getSpawnRate() + "/" + currentPlayer.getX() + "/" + currentPlayer.getY(), String.class);
                 }
+                switchPlayerAndSpawnSoldiersTime += System.currentTimeMillis() - tempStartTime; //todo delete
                 /**
                  * Moves all soldiers of currently active player
                  */
+                tempStartTime = System.currentTimeMillis(); //todo delete
                 String moveSoldiers = restTemplate.getForObject("http://soldier-service/api/soldier/moveSoldiers/" + currentPlayerId, String.class);
+                moveSoldiersTime += System.currentTimeMillis() - tempStartTime; //todo delete
                 /**
                  * Attacks from current player soldiers against other players
                  */
+                tempStartTime = System.currentTimeMillis(); //todo delete
                 Long enemyPlayer = getEnemyPlayerId(currentPlayerId, playersList);
-                System.out.println("enemyPlayer:" + enemyPlayer);
-                System.out.println("currentPlayerId before fight:" + currentPlayerId);
                 Long conqueredPlayerId = restTemplate.getForObject("http://soldier-service/api/soldier/soldiersFight/" + currentPlayerId + "/" + enemyPlayer, Long.class);
-                System.out.println("conqueredPlayerId:" + conqueredPlayerId);
-                System.out.println("currentPlayerId:" + currentPlayerId);
+                soldiersFightTime += System.currentTimeMillis() - tempStartTime; //todo delete
+
+                tempStartTime = System.currentTimeMillis(); //todo delete
                 if (conqueredPlayerId != null && conqueredPlayerId != 0) {
                     playersList.setPlayers(playersList.getPlayers().stream().filter(p -> p.getPlayerId() != conqueredPlayerId)
                             .toList());
@@ -99,17 +111,20 @@ public class BoardService {
                     playersList.setPlayers(new ArrayList<>());
                     System.out.println("GAME OVER");
                 }
-
+                resetGameTime += System.currentTimeMillis() - tempStartTime; //todo delete
+                /**
+                 * Get all soldiers
+                */
+                tempStartTime = System.currentTimeMillis(); //todo delete
                 SoldiersList soldiersList = restTemplate.getForObject("http://soldier-service/api/soldier/getSoldiers", SoldiersList.class);
                 List<Soldier> soldiers = soldiersList.getSoldiers();
-
 
                 /**
                  * Places all units(players and soldiers) on the board - for visualization purpouse
                  */
                 List<List<Unit>> listOfUnitsLists = new ArrayList<>();
                 listOfUnitsLists = placeUnitsOnBoard(players, soldiers, listOfUnitsLists);
-
+                getSoldiersAndPlaceAllUnitsOnBoardTime += System.currentTimeMillis() - tempStartTime; //todo delete
                 //koniec tury. dodanie do sumy tur
                 totalTurns++;
             }
@@ -120,7 +135,7 @@ public class BoardService {
         totalTimeMillisecs = endTime - startTime;
 
 //        return listOfUnitsLists;
-        return new GameData(totalTimeMillisecs, totalTurns, "OK");
+        return new GameData(totalTimeMillisecs, totalTurns, spawnPlayersTime, switchPlayerAndSpawnSoldiersTime, moveSoldiersTime, soldiersFightTime, resetGameTime,getSoldiersAndPlaceAllUnitsOnBoardTime, "OK");
     }
 
 
@@ -171,12 +186,9 @@ public class BoardService {
 
     private long switchPlayerTurn(long currentPlayerTurn, PlayersList playersList) {
 
-        if (currentPlayerTurn == playersList.getPlayers().get(0).getPlayerId())
-        {
+        if (currentPlayerTurn == playersList.getPlayers().get(0).getPlayerId()) {
             currentPlayerTurn = playersList.getPlayers().get(1).getPlayerId();
-        }
-        else
-        {
+        } else {
             currentPlayerTurn = playersList.getPlayers().get(0).getPlayerId();
         }
         return currentPlayerTurn;
@@ -184,7 +196,7 @@ public class BoardService {
 
     private long getEnemyPlayerId(long currentPlayerId, PlayersList playersList) {
         long enemyPlayerId = 0;
-        for (Player player: playersList.getPlayers()) {
+        for (Player player : playersList.getPlayers()) {
             if (currentPlayerId != player.getPlayerId()) {
                 enemyPlayerId = player.getPlayerId();
             }
